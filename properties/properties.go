@@ -1,3 +1,5 @@
+// Package properties defines a type to store an email and password, and methods to
+// extract that information from a properly formatted .properties file.
 package properties
 
 import (
@@ -7,11 +9,16 @@ import (
 	"strings"
 )
 
+// Properties represents an email and a password, typically coming from a file
+// formatted like autoingestion.properties.example
 type Properties struct {
 	Email    string
 	Password string
 }
 
+// NewPropertiesFromFile receives a file name, extracts a username and
+// password from it, then returns an instance of Properties containtaing those
+// attributes. The argument must be a filesystem path.
 func NewPropertiesFromFile(name string) Properties {
 	p := Properties{}
 	p.fromFile(name)
