@@ -3,6 +3,7 @@
 package properties
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -22,12 +23,13 @@ type Properties struct {
 func NewPropertiesFromFile(name string) Properties {
 	p := Properties{}
 	p.fromFile(name)
+
 	return p
 }
 
 func (p *Properties) fromFile(name string) {
-	str := p.readFile(name)
-	if str == "" {
+	str, err := p.readFile(name)
+	if err != nil {
 		return
 	}
 
@@ -39,6 +41,7 @@ func (p *Properties) fromFile(name string) {
 func (p *Properties) extractEmail(str string) {
 	// find the account email address
 	re := regexp.MustCompile("(?m:^userID = )((?m)\\w+@\\w+\\.com$)")
+
 	m := re.FindStringSubmatch(str)
 	// first match is the whole regex. Second is the subgroup match.
 	if len(m) != 2 {
@@ -60,11 +63,11 @@ func (p *Properties) extractPassword(str string) {
 	p.Password = m[1]
 }
 
-func (p *Properties) readFile(fn string) string {
+func (p *Properties) readFile(fn string) (string, error) {
 	file, err := os.Open(fn)
 	if err != nil {
 		fmt.Println("error opening properties file", err)
-		return ""
+		return "", err
 	}
 	defer file.Close()
 
@@ -72,7 +75,7 @@ func (p *Properties) readFile(fn string) string {
 	fi, err := file.Stat()
 	if err != nil {
 		fmt.Println("could not read file stats", err)
-		return ""
+		return "", err
 	}
 	nb := fi.Size()
 
@@ -81,12 +84,12 @@ func (p *Properties) readFile(fn string) string {
 	rb, err := file.Read(b)
 	if err != nil {
 		fmt.Println("could not read file", err)
-		return ""
+		return "", err
 	}
 	if int64(rb) != nb {
-		fmt.Println("did not read in as many bytes as size of file", err)
-		return ""
+		fmt.Println("did not read in as many bytes as size of file")
+		return "", errors.New("did not read in as many bytes as size of file")
 	}
 
-	return strings.TrimSpace(string(b))
+	return strings.TrimSpace(string(b)), nil
 }
