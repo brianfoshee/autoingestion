@@ -1,17 +1,31 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/brianfoshee/autoingestion/properties"
+)
 
 func TestProcessArgs(t *testing.T) {
-	tests := struct {
-		Args []string
-		Params
-	}{}
+	tests := []struct {
+		Args       []string
+		Valid      bool
+		Properties properties.Properties
+	}{
+		{
+			Args:       []string{"properties"},
+			Valid:      false,
+			Properties: properties.Properties{},
+		},
+	}
 
-	for _, t := range tests {
-		p := processArgs(t.Args)
-		if p.Params != t.Params {
-			t.Errorf("expected (%+v) actual (%+v)", t.Params, p.Params)
+	for _, c := range tests {
+		p, err := processArgs(c.Args)
+		if err != nil && c.Valid {
+			t.Errorf("expected an error")
+		}
+		if p.Properties != c.Properties {
+			t.Errorf("expected (%+v) actual (%+v)", c.Properties, p.Properties)
 		}
 	}
 }

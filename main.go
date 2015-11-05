@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -30,7 +32,7 @@ type Params struct {
 	ReportSubType      string
 	Date               time.Time
 
-	Properties
+	properties.Properties
 }
 
 func main() {
@@ -48,20 +50,21 @@ func main() {
 	   - use those values in the form data
 	*/
 
-	if len(args) < 5 {
-		fmt.Println("not enough args")
-		return
-	}
-
 	p, err := processArgs(args)
 	if err != nil {
 		fmt.Println("error processing args", err)
 		return
 	}
+	log.Printf("got args %+v", p)
 
 }
 
-func processArgs(args []string) Params {
+func processArgs(args []string) (Params, error) {
 	p := Params{}
+	if len(args) < 5 {
+		return p, errors.New("not enough args")
+	}
+
 	p.Properties = properties.NewPropertiesFromFile(p.PropertiesFilePath)
+	return p, nil
 }
