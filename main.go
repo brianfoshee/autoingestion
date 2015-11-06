@@ -32,7 +32,7 @@ type Params struct {
 	ReportSubType      string
 	Date               time.Time
 
-	properties.Properties
+	Properties properties.Properties
 }
 
 func main() {
