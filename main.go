@@ -65,6 +65,8 @@ func processArgs(args []string) (Params, error) {
 		return p, errors.New("not enough args")
 	}
 
+	p.PropertiesFilePath = args[0]
 	p.Properties = properties.NewPropertiesFromFile(p.PropertiesFilePath)
+	p.VendorID = args[1]
 	return p, nil
 }
